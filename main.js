@@ -22,13 +22,50 @@ canvas.width = w;
 
 ctx.fillstyle = COLOR_BG;
 ctx.strokeStyle = COLOR_CUBE;
-ctx.lineWidth = w/100;
+ctx.lineWidth = w/500;
 ctx.lineCap = "round";
+let n;
+let m;
 
-var cx = w/2;
-var cy = h/2;
+function canvasLoop(e) {
+    var movementX = e.movementX ||
+        e.mozMovementX          ||
+        e.webkitMovementX       ||
+        0;
+  
+    var movementY = e.movementY ||
+        e.mozMovementY      ||
+        e.webkitMovementY   ||
+        0;
+  
+    x += movementX;
+    y += movementY;
+  
+    var animation = requestAnimationFrame(canvasLoop);
+  
+    tracker.innerHTML = "X position: " + x + ', Y position: ' + y;
+  }
+
+function lockChangeAlert() {
+    if(document.pointerLockElement === canvas) {
+      console.log('The pointer lock status is now locked');
+      document.addEventListener("mousemove", canvasLoop, false);
+    } else {
+      console.log('The pointer lock status is now unlocked');  
+      document.removeEventListener("mousemove", canvasLoop, false);
+    }
+  }
+  
+
+canvas.onclick = function() {
+    canvas.requestPointerLock();
+  }
+  document.addEventListener('pointerlockchange', lockChangeAlert, false);
+
+var cx = 0 + w/40;
+var cy = 0 + h/20;
 var cz = 0;
-var size = h/4;
+var size = h/20;
 var vertices = [
     new POINT3D(cx - size, cy - size, cz - size),
     new POINT3D(cx + size, cy - size, cz - size),
@@ -46,24 +83,13 @@ var edges = [
     [0,4], [1,5], [2,6], [3,7]
 ];
 
+var q = 0
+
 var timeDelta, timeLast = 0;
 
 requestAnimationFrame(loop);
 
 function loop(timeNow) {
-
-    document.onpointerdown  = function(event) {
-        pointerX = event.pageX;
-        pointerY = event.pageY;
-        if(pointerY < 150) p += 1, click = true;
-    }
-
-    document.onpointerup  = function(event) {
-        pointerX = event.pageX;
-        pointerY = event.pageY;
-        if(pointerY < 150) p += 1;
-        click = false;
-    }
 
     timeDelta = timeNow - timeLast;
     timeLast = timeNow;
@@ -102,12 +128,22 @@ function loop(timeNow) {
         v.z = z + cz;
     }
 
-    for (let edge of edges) {
-        ctx.beginPath();
-        ctx.moveTo(vertices[edge[0]].x, vertices[edge[0]].y);
-        ctx.lineTo(vertices[edge[1]].x, vertices[edge[1]].y);
-        ctx.stroke();
+    while(q<10){
+        while(k<20){
+            for (let edge of edges) {
+                ctx.beginPath();
+                ctx.moveTo(vertices[edge[0]].x + k*(h/10), vertices[edge[0]].y + q*(h/10));
+                ctx.lineTo(vertices[edge[1]].x + k*(h/10), vertices[edge[1]].y + q*(h/10));
+                ctx.stroke();
+            }
+            k += 1
+
+        }
+        if(k=20) k=0;
+        q += 1
     }
+
+    if(q=10) q=0;
 
     requestAnimationFrame(loop);
 }
