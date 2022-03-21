@@ -1,6 +1,8 @@
 try:
     import pygame
 except:
+    print("pygame isn't installed")
+    print("installing pygame...")
     import subprocess
     import sys
     subprocess.check_call([sys.executable, "-m", "pip", "install", "pygame"])
@@ -9,7 +11,7 @@ import math
 import random
 pygame.init()
 
-screen = pygame.display.set_mode((1500,100))
+screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN, 32)
 w, h = screen.get_size()
 if w/1.7777-50<=h<=w/1.7777+50:
     pass
@@ -402,11 +404,11 @@ class boss1(Monster):
     hp = 500
     max_hp = 500
     armor = 3
-    gold_drop = 50
+    gold_drop = 20
     speed = w/1920
     damage = 20
     kill_score = 20
-    xp_drop = 5
+    xp_drop = 2
 
 class boss2(Monster):
     color = (84, 94, 14)
@@ -415,11 +417,11 @@ class boss2(Monster):
     hp = 500
     max_hp = 500
     armor = 30
-    gold_drop = 75
-    speed = w/1920
+    gold_drop = 30
+    speed = w/960
     damage = 30
     kill_score = 30
-    xp_drop = 7.5
+    xp_drop = 3
 
 class fast_monster(Monster):
     color = (255,255,0)
@@ -619,7 +621,7 @@ tt26 = tt(150,170,"until you finish the wave that you have started", (0,0,0),12)
 tt27 = tt(150,190,"click next wave to continue", (0,0,0), 12)
 tt28 = tt(w/2, 20, "You have not discovered any monsters yet!", (255,0,0), 48)
 tt29 = tt(200, 100, "Penatrating Bullets", (0,0,0), 32)
-tt30 = tt(200, 135, "All towers do +5 damage to armored units", (0,0,0), 16)
+tt30 = tt(200, 135, "All towers do +5 damage", (0,0,0), 16)
 tt31 = tt(200, 300, "Critical Chance l", (0,0,0), 32)
 tt32 = tt(200, 500, "Critical Chance ll", (0,0,0), 32)
 tt33 = tt(200, 335, "+5% chance to hit for x2 damage", (0,0,0), 16)
@@ -629,6 +631,9 @@ tt36 = tt(200, 555, "Damage stacks with critical chance l", (0,0,0), 16)
 tt37 = tt(200, 100, "Sound:", (0,0,0), 36)
 font3 = pygame.font.SysFont("Arial", round(w/96))
 no_gold1 = False
+tt38 = font3.render("Current crit -- %"+str(critx2), True, (0,0,0))
+tt39 = font3.render("Current crit -- %"+str(critx3), True, (0,0,0))
+tt40 = font3.render("Current damage -- "+str(armor_dmg), True, (0,0,0))
 
 R_Button1 = Button(w/3.85, h/12, w/9.6, h/21.6, "Research for 100xp", w/96, False, True)
 B_Button1 = Button(w/3.85, h/12, w/9.6, h/21.6, "Bought", w/96, False, True)
@@ -662,7 +667,7 @@ basic_info = Monster_Info(w/19.2,h/21.6,"Weak Boi",5,3,0,1,(0,0,0))
 tough_info = Monster_Info(w/4.8,h/21.6,"Tough Boi",20,2,1,2,(33,122,64))
 boss1_info = Monster_Info(w/2.743,h/21.6,"Chunky Boi",500,1,3,20,(255,0,0))
 fast_info = Monster_Info(w/1.92, h/21.6, "Speedy Boi",40,5,0,3,(255,255,0))
-boss2_info = Monster_Info(w/1.477, h/21.6, "Chonky Boi",500,1,30,30,(84, 94, 14))
+boss2_info = Monster_Info(w/1.477, h/21.6, "Chonky Boi",500,2,30,30,(84, 94, 14))
 
 encounter = False
 encounter1 = False
@@ -750,7 +755,7 @@ Encounter1 = Encounter("Weak Boi", (0,0,0), 5, 0, 3, 1)
 Encounter2 = Encounter("Tough Boi", (33,122,64), 20, 1, 2, 2)
 Encounter3 = Encounter("Chunky Boi", (255,0,0), 500, 3, 1, 20)
 Encounter4 = Encounter("Speedy Boi", (255,255,0), 20, 0, 5, 3)
-Encounter5 = Encounter("Chonky Boi", (84, 94, 14), 500, 30, 1, 30)
+Encounter5 = Encounter("Chonky Boi", (84, 94, 14), 500, 30, 2, 30)
 xp_txt = font.render("XP -- " + str(xp), True, (0,0,0))
 show_R1 = True
 show_R2 = True
@@ -804,6 +809,7 @@ while run:
                     wave = 0
                     gold = 100
                     xp = 0
+                    score = 0
                     demo_complete = False
                     base = Base()
                     gold_txt = font.render("Gold -- " + str(gold), True, (0,0,0))
@@ -825,6 +831,7 @@ while run:
                     game_over = False
                     base = Base()
                     xp = 0
+                    score = 0
                     gold_txt = font.render("Gold -- " + str(gold), True, (0,0,0))
                     wave_txt = font.render("Wave -- " + str(wave), True, (0,0,0))
                     hp_txt = font.render(str(base.hp) + "/100", True, (0,0,0))
@@ -946,6 +953,9 @@ while run:
                         if xp >= 100:
                             armor_dmg += 5
                             xp -= 100
+                            tt40 = font3.render("Current damage -- "+str(armor_dmg), True, (0,0,0))
+                            if armor_dmg<100:
+                                show_R1 = True
                         else:
                             show_R1 = True
                 if show_R2:
@@ -954,16 +964,22 @@ while run:
                         if xp >= 150:
                             critx2 += 5
                             xp -= 150
+                            if critx2 < 100:
+                                show_R2 = True
+                            tt38 = font3.render("Current crit -- %"+str(critx2), True, (0,0,0))
                         else:
-                            show_R1 = True
+                            show_R2 = True
                 if show_R3:
                     show_R3 = R_Button3.if_click()
                     if show_R3 == False:
                         if xp >= 200:
                             critx3 += 3
                             xp -= 200
+                            if critx3 < 100:
+                                show_R3 = True
+                            tt39 = font3.render("Current crit -- %"+str(critx3), True, (0,0,0))
                         else:
-                            show_R1 = True
+                            show_R3 = True
 
             elif settings:
                 change_sound = S_Button1.if_click()
@@ -1173,7 +1189,7 @@ while run:
                         upgrade = upgrades(towers[index].x-w/12.8,towers[index].y-h/5.4,towers[index].dmg,towers[index].attack_speed,towers[index].range2,towers[index].up_cost1,towers[index].up_cost2,towers[index].up_cost3,towers[index].progress,towers[index].sell_value)
                     
 
-                if defend == True and monsters == [] and wave != 10:
+                if defend == True and monsters == [] and wave != 12:
                     wave += 1
                     wave_txt = font.render("Wave -- " + str(wave), True, (0,0,0))
                     if wave == 1:
@@ -1241,6 +1257,20 @@ while run:
                             monsters.append(boss1(a*w/32))
                             a+=1
                         monsters.append(boss2(w/0.32))
+                    if wave == 11:
+                        a=1
+                        while a<=5:
+                            monsters.append(boss2(a*w/16))
+                            a+=1
+                    if wave == 12:
+                        a=1
+                        while a<=50:
+                            monsters.append(fast_monster(a*w/32))
+                            a+=1
+                        a=1
+                        while a<= 10:
+                            monsters.append(boss2(a*w/32))
+                            a+=1
 
                 if encounter1 == False:
                     if wave == 1:
@@ -1450,6 +1480,9 @@ while run:
         tt34.blit()
         tt35.blit()
         tt36.blit()
+        screen.blit(tt38, (500,355))
+        screen.blit(tt39, (500,555))
+        screen.blit(tt40, (500,155))
         B_Button1.blit()
         B_Button2.blit()
         B_Button3.blit()
@@ -1512,7 +1545,7 @@ while run:
         if base.hp <= 0:
             game_over = True
 
-        if wave == 10 and monsters == [] and game_over == False:
+        if wave == 12 and monsters == [] and game_over == False:
             d += 1
             if d == 120:
                 score += base.hp*10
@@ -1597,9 +1630,9 @@ while run:
                 b=0
                 no_gold1 = False
 
-    if wave == 10 and monsters == [] and game_over == False:
+    if wave == 12 and monsters == [] and game_over == False:
         shop = False
-        wave = 10
+        wave = 12
 
     clock.tick(60)
     pygame.display.update()
