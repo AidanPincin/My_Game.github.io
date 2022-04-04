@@ -24,6 +24,8 @@ big_font = pygame.font.SysFont("Arial", round(w/54))
 load_text = big_font.render("Loading...", True, (255,255,255))
 load_width = load_text.get_width()
 
+##game_speed = 1
+
 def load():
     Button.counter += 1
     screen.fill((0,0,0))
@@ -448,6 +450,7 @@ monster_button = Button(w/6.981,h/216,w/19.2,h/27,"Monster info", w/120, True, F
 research_button = Button(w/4.8, h/216, w/19.2, h/27, "Research", w/120, True, False)
 settings_button = Button(w/3.657,h/216, w/19.2, h/27, "Settings", w/120, True, False)
 back_button = Button(w/2-w/38.4,h-h/5.4,w/19.2,h/21.6,"Back",w/80,False,True)
+##speed_button = Button(w/2,h/216,100,30,"speed",24,True,False)
 buy1 = Button(w/19.2,h/3.6,w/19.2,h/27,"Buy",w/80,True,False)
 buy2 = Button(w/4.8,h/3.6,w/19.2,h/27,"Buy",w/80,True,False)
 buy3 = Button(w/2.743,h/3.6,w/19.2,h/27,"Buy",w/80,True,False)
